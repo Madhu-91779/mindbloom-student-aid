@@ -8,60 +8,68 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Wellness-focused color palette */
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* Gen Z Vibes - Bold & Vibrant */
+    --background: 250 30% 97%;
+    --foreground: 222 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 222 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 222 25% 12%;
 
-    /* Calming blue primary */
-    --primary: 212 75% 58%;
+    /* Electric Blue Primary */
+    --primary: 220 85% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 212 85% 75%;
-    --primary-dark: 212 65% 45%;
+    --primary-light: 220 95% 80%;
+    --primary-dark: 220 75% 50%;
 
-    /* Soft green secondary */
-    --secondary: 162 65% 65%;
+    /* Vibrant Green Secondary */
+    --secondary: 140 80% 60%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 162 75% 80%;
+    --secondary-light: 140 90% 75%;
 
-    /* Light background tones */
-    --muted: 210 30% 96%;
-    --muted-foreground: 215 15% 55%;
+    /* Soft backgrounds */
+    --muted: 250 25% 95%;
+    --muted-foreground: 215 20% 50%;
 
-    /* Purple accent */
-    --accent: 262 55% 70%;
+    /* Hot Pink Accent */
+    --accent: 320 85% 70%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 262 65% 85%;
+    --accent-light: 320 95% 85%;
 
-    --destructive: 0 75% 65%;
+    --destructive: 0 85% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 94%;
-    --ring: 212 75% 58%;
+    --border: 220 25% 88%;
+    --input: 220 20% 92%;
+    --ring: 220 85% 65%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Wellness-specific tokens */
-    --wellness-gradient: linear-gradient(135deg, hsl(212 75% 58%), hsl(162 65% 65%));
-    --mood-happy: 45 95% 70%;
-    --mood-good: 120 65% 65%;
-    --mood-neutral: 210 15% 70%;
-    --mood-sad: 220 75% 65%;
-    --mood-anxious: 15 75% 65%;
-
-    /* Shadows and effects */
-    --shadow-wellness: 0 4px 20px -2px hsl(212 75% 58% / 0.1);
-    --shadow-card: 0 2px 10px -2px hsl(215 25% 15% / 0.05);
+    /* Gen Z Color Palette */
+    --wellness-gradient: linear-gradient(135deg, hsl(220 85% 65%), hsl(320 85% 70%), hsl(140 80% 60%));
+    --glass-gradient: linear-gradient(135deg, hsl(220 85% 65% / 0.1), hsl(320 85% 70% / 0.1));
+    --mood-happy: 45 100% 65%;
+    --mood-good: 120 75% 60%;
+    --mood-neutral: 210 25% 65%;
+    --mood-sad: 220 80% 60%;
+    --mood-anxious: 15 85% 65%;
     
-    /* Animation */
+    /* Trendy extras */
+    --orange-vibe: 25 95% 65%;
+    --purple-vibe: 280 85% 70%;
+    --cyan-vibe: 190 85% 65%;
+
+    /* Enhanced shadows and effects */
+    --shadow-wellness: 0 8px 32px -8px hsl(220 85% 65% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(222 25% 12% / 0.08);
+    --shadow-glow: 0 0 40px -10px hsl(220 85% 65% / 0.3);
+    
+    /* Smooth animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 

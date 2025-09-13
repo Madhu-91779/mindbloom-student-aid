@@ -72,11 +72,10 @@ const MoodLogger = () => {
     <div className="min-h-screen bg-background p-4 space-y-6">
       {/* Header */}
       <div className="text-center py-6">
-        <h1 className="text-2xl font-bold flex items-center justify-center gap-2 mb-2">
-          <Heart className="h-6 w-6 text-primary" />
-          Mood Logger
+        <h1 className="text-3xl font-display font-bold flex items-center justify-center gap-2 mb-2 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-bounce-in">
+          💫 mood diary ✨
         </h1>
-        <p className="text-muted-foreground">How are you feeling right now?</p>
+        <p className="text-muted-foreground font-medium">spill the tea - how u feelin rn?</p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span>{currentTime}</span>
@@ -84,9 +83,9 @@ const MoodLogger = () => {
       </div>
 
       {/* Mood Selection */}
-      <Card className="border-0 bg-card shadow-card">
+      <Card className="border-0 bg-gradient-to-br from-card via-card to-primary/5 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Select Your Mood</CardTitle>
+          <CardTitle className="text-lg font-display">pick ur vibe ✨</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
@@ -94,15 +93,15 @@ const MoodLogger = () => {
               <Button
                 key={index}
                 variant={selectedMood === mood.label ? "default" : "outline"}
-                className={`h-20 flex-col space-y-2 transition-all duration-300 ${
+                className={`h-20 flex-col space-y-2 transition-all duration-300 font-display ${
                   selectedMood === mood.label 
-                    ? "bg-primary text-primary-foreground shadow-wellness scale-105" 
-                    : "hover:bg-primary-light/10 hover:border-primary hover:scale-102"
+                    ? "bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow scale-110 animate-glow-pulse" 
+                    : "hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 hover:border-primary hover:scale-105 hover:shadow-wellness"
                 }`}
                 onClick={() => handleMoodSelect(mood.label)}
               >
-                <span className="text-2xl">{mood.emoji}</span>
-                <span className="text-xs">{mood.label}</span>
+                <span className="text-3xl animate-bounce-in">{mood.emoji}</span>
+                <span className="text-xs font-medium">{mood.label}</span>
               </Button>
             ))}
           </div>
@@ -111,11 +110,11 @@ const MoodLogger = () => {
 
       {/* Mood Intensity */}
       {selectedMood && (
-        <Card className="border-0 bg-card shadow-card animate-slide-up">
+        <Card className="border-0 bg-gradient-to-br from-accent/5 via-card to-secondary/5 shadow-wellness animate-slide-up backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Intensity Level</CardTitle>
+            <CardTitle className="text-lg font-display">intensity check 🌡️</CardTitle>
             <p className="text-sm text-muted-foreground">
-              How strongly are you feeling this mood?
+              how hard is this mood hitting? no cap 💯
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -143,11 +142,11 @@ const MoodLogger = () => {
       )}
 
       {/* Mood Tags */}
-      <Card className="border-0 bg-card shadow-card">
+      <Card className="border-0 bg-gradient-to-br from-secondary/5 via-card to-primary/5 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg">What's influencing your mood?</CardTitle>
+          <CardTitle className="text-lg font-display">what's the sitch? 🤔</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Select any factors that might be affecting how you feel
+            tag what's influencing ur energy rn (optional but helpful! 💫)
           </p>
         </CardHeader>
         <CardContent>
@@ -196,10 +195,10 @@ const MoodLogger = () => {
         <Button 
           onClick={handleSaveMood}
           disabled={!selectedMood}
-          className="w-full h-14 text-lg bg-primary hover:bg-primary-dark disabled:opacity-50 transition-all duration-300"
+          className="w-full h-14 text-lg font-display font-semibold bg-gradient-to-r from-primary via-accent to-secondary hover:from-primary-dark hover:via-accent/80 hover:to-secondary/80 disabled:opacity-50 disabled:hover:from-primary disabled:hover:via-accent disabled:hover:to-secondary transition-all duration-300 hover:scale-105 hover:shadow-glow animate-glow-pulse"
         >
           <Save className="h-5 w-5 mr-2" />
-          Save Mood Entry
+          save this vibe ✨
         </Button>
       </div>
     </div>

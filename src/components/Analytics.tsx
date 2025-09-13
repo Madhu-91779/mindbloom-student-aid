@@ -49,19 +49,18 @@ const Analytics = () => {
     <div className="min-h-screen bg-background p-4 space-y-6 pb-24">
       {/* Header */}
       <div className="text-center py-6">
-        <h1 className="text-2xl font-bold flex items-center justify-center gap-2 mb-2">
-          <TrendingUp className="h-6 w-6 text-primary" />
-          Wellness Insights
+        <h1 className="text-3xl font-display font-bold flex items-center justify-center gap-2 mb-2 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-bounce-in">
+          📊 ur stats are fire ✨
         </h1>
-        <p className="text-muted-foreground">Understanding your wellness patterns</p>
+        <p className="text-muted-foreground font-medium">peep these wellness insights bestie 💫</p>
       </div>
 
       {/* Weekly Mood Chart */}
-      <Card className="border-0 bg-card shadow-card">
+      <Card className="border-0 bg-gradient-to-br from-card via-card to-primary/5 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            Weekly Mood Trend
+          <CardTitle className="flex items-center gap-2 font-display">
+            <Calendar className="h-5 w-5 text-primary animate-pulse-gentle" />
+            weekly mood check 📈
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -94,9 +93,9 @@ const Analytics = () => {
 
       {/* Key Insights */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Brain className="h-5 w-5 text-primary" />
-          Key Insights
+        <h2 className="text-lg font-display font-semibold flex items-center gap-2">
+          <Brain className="h-5 w-5 text-accent animate-pulse-gentle" />
+          the tea ☕ (insights)
         </h2>
         
         {insights.map((insight, index) => (
@@ -124,15 +123,15 @@ const Analytics = () => {
       </div>
 
       {/* Weekly Stats */}
-      <Card className="border-0 bg-gradient-to-br from-primary/5 to-secondary/5 shadow-card">
+      <Card className="border-0 bg-gradient-to-br from-accent/10 via-primary/5 to-secondary/10 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg">This Week's Stats</CardTitle>
+          <CardTitle className="text-lg font-display">this week's stats 📊</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">Average Mood</span>
-              <span className="text-sm font-semibold">7.2/10</span>
+              <span className="text-sm text-foreground font-display">average mood</span>
+              <span className="text-sm font-display font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">7.2/10 ✨</span>
             </div>
             <Progress value={72} className="h-2" />
           </div>
