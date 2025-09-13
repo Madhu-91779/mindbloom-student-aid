@@ -8,35 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Wellness-focused color palette */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Calming blue primary */
+    --primary: 212 75% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 212 85% 75%;
+    --primary-dark: 212 65% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft green secondary */
+    --secondary: 162 65% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 162 75% 80%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Light background tones */
+    --muted: 210 30% 96%;
+    --muted-foreground: 215 15% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Purple accent */
+    --accent: 262 55% 70%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 262 65% 85%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 65%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 90%;
+    --input: 210 20% 94%;
+    --ring: 212 75% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Wellness-specific tokens */
+    --wellness-gradient: linear-gradient(135deg, hsl(212 75% 58%), hsl(162 65% 65%));
+    --mood-happy: 45 95% 70%;
+    --mood-good: 120 65% 65%;
+    --mood-neutral: 210 15% 70%;
+    --mood-sad: 220 75% 65%;
+    --mood-anxious: 15 75% 65%;
+
+    /* Shadows and effects */
+    --shadow-wellness: 0 4px 20px -2px hsl(212 75% 58% / 0.1);
+    --shadow-card: 0 2px 10px -2px hsl(215 25% 15% / 0.05);
+    
+    /* Animation */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     --sidebar-background: 0 0% 98%;
 
