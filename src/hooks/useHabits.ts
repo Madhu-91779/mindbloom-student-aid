@@ -64,25 +64,23 @@ export const useToggleHabit = () => {
   return useMutation({
     mutationFn: async ({ habitId, completed }: { habitId: string; completed: boolean }) => {
       if (completed) {
-        // Uncomplete: delete today's completion
         await supabase
           .from("habit_completions")
           .delete()
           .eq("habit_id", habitId)
           .eq("completed_date", today);
-        // Decrement streak
-        await supabase.rpc("decrement_habit_streak" as any, { habit_id_input: habitId });
+        const { data: habit } = await supabase.from("habits").select("streak").eq("id", habitId).single();
+        const newStreak = Math.max(0, (habit?.streak ?? 1) - 1);
+        await supabase.from("habits").update({ streak: newStreak } as any).eq("id", habitId);
       } else {
-        // Complete: insert today's completion
         const { error } = await supabase
           .from("habit_completions")
-          .insert({ habit_id: habitId, user_id: user!.id, completed_date: today });
+          .insert({ habit_id: habitId, user_id: user!.id, completed_date: today } as any);
         if (error) throw error;
-        // Increment streak
-        await supabase
-          .from("habits")
-          .update({ streak: (await supabase.from("habits").select("streak").eq("id", habitId).single()).data!.streak + 1 })
-          .eq("id", habitId);
+        const { data: habit } = await supabase.from("habits").select("streak, best_streak").eq("id", habitId).single();
+        const newStreak = (habit?.streak ?? 0) + 1;
+        const bestStreak = Math.max(habit?.best_streak ?? 0, newStreak);
+        await supabase.from("habits").update({ streak: newStreak, best_streak: bestStreak } as any).eq("id", habitId);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["habits"] }),
