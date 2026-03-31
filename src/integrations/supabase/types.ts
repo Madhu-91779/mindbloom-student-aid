@@ -14,7 +14,287 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          activity_type: string
+          calories: number | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          logged_date: string
+          notes: string | null
+          steps: number | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          calories?: number | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          logged_date?: string
+          notes?: string | null
+          steps?: number | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          calories?: number | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          logged_date?: string
+          notes?: string | null
+          steps?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          category: string
+          created_at: string
+          current_count: number
+          due_date: string | null
+          goal_type: string
+          id: string
+          is_completed: boolean
+          target_count: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          current_count?: number
+          due_date?: string | null
+          goal_type?: string
+          id?: string
+          is_completed?: boolean
+          target_count?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          current_count?: number
+          due_date?: string | null
+          goal_type?: string
+          id?: string
+          is_completed?: boolean
+          target_count?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      habit_completions: {
+        Row: {
+          completed_date: string
+          created_at: string
+          habit_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_date?: string
+          created_at?: string
+          habit_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_date?: string
+          created_at?: string
+          habit_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_completions_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      habits: {
+        Row: {
+          best_streak: number
+          created_at: string
+          id: string
+          is_active: boolean
+          streak: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          best_streak?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          streak?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          best_streak?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          streak?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          ai_feedback: string | null
+          content: string
+          created_at: string
+          emotions: string[] | null
+          id: string
+          sentiment: string | null
+          sentiment_score: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          content: string
+          created_at?: string
+          emotions?: string[] | null
+          id?: string
+          sentiment?: string | null
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          content?: string
+          created_at?: string
+          emotions?: string[] | null
+          id?: string
+          sentiment?: string | null
+          sentiment_score?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mood_logs: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          intensity: number
+          logged_at: string
+          mood: string
+          note: string | null
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          intensity: number
+          logged_at?: string
+          mood: string
+          note?: string | null
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          intensity?: number
+          logged_at?: string
+          mood?: string
+          note?: string | null
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          level: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          level?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          level?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      sleep_logs: {
+        Row: {
+          bedtime: string | null
+          created_at: string
+          hours: number
+          id: string
+          logged_date: string
+          notes: string | null
+          quality: number | null
+          user_id: string
+          wake_time: string | null
+        }
+        Insert: {
+          bedtime?: string | null
+          created_at?: string
+          hours: number
+          id?: string
+          logged_date?: string
+          notes?: string | null
+          quality?: number | null
+          user_id: string
+          wake_time?: string | null
+        }
+        Update: {
+          bedtime?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          logged_date?: string
+          notes?: string | null
+          quality?: number | null
+          user_id?: string
+          wake_time?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
