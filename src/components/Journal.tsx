@@ -3,108 +3,108 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Save, Sparkles, Calendar, Smile, Meh, Frown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BookOpen, Save, Sparkles, Calendar, Smile, Meh, Frown, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useJournalEntries, useCreateJournalEntry } from "@/hooks/useJournalEntries";
 
 const Journal = () => {
   const { toast } = useToast();
   const [journalEntry, setJournalEntry] = useState("");
   const [sentiment, setSentiment] = useState<"positive" | "neutral" | "negative" | null>(null);
+  const { data: entries, isLoading } = useJournalEntries();
+  const createEntry = useCreateJournalEntry();
 
-  // Mock sentiment analysis - in real app this would call an AI service
-  const analyzeSentiment = (text: string) => {
-    const positiveWords = ["happy", "good", "great", "amazing", "wonderful", "excited", "love", "grateful", "blessed"];
-    const negativeWords = ["sad", "bad", "terrible", "awful", "hate", "angry", "stressed", "worried", "anxious"];
-    
+  const analyzeSentiment = (text: string): "positive" | "neutral" | "negative" => {
+    const positiveWords = ["happy", "good", "great", "amazing", "wonderful", "excited", "love", "grateful", "blessed", "productive", "proud", "accomplished"];
+    const negativeWords = ["sad", "bad", "terrible", "awful", "hate", "angry", "stressed", "worried", "anxious", "overwhelmed", "exhausted", "frustrated"];
     const lowerText = text.toLowerCase();
-    const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-    
-    if (positiveCount > negativeCount) return "positive";
-    if (negativeCount > positiveCount) return "negative";
+    const pos = positiveWords.filter((w) => lowerText.includes(w)).length;
+    const neg = negativeWords.filter((w) => lowerText.includes(w)).length;
+    if (pos > neg) return "positive";
+    if (neg > pos) return "negative";
     return "neutral";
+  };
+
+  const detectEmotions = (text: string): string[] => {
+    const emotionMap: Record<string, string[]> = {
+      happiness: ["happy", "joy", "excited", "wonderful", "love", "grateful"],
+      stress: ["stressed", "overwhelmed", "pressure", "deadline", "tense"],
+      anxiety: ["anxious", "worried", "nervous", "uneasy", "scared"],
+      fatigue: ["tired", "exhausted", "drained", "sleepy", "burnt out"],
+      motivation: ["motivated", "inspired", "determined", "focused", "productive"],
+    };
+    const lower = text.toLowerCase();
+    return Object.entries(emotionMap)
+      .filter(([, words]) => words.some((w) => lower.includes(w)))
+      .map(([emotion]) => emotion);
   };
 
   const handleTextChange = (text: string) => {
     setJournalEntry(text);
     if (text.length > 20) {
-      const analyzedSentiment = analyzeSentiment(text);
-      setSentiment(analyzedSentiment);
+      setSentiment(analyzeSentiment(text));
     } else {
       setSentiment(null);
     }
   };
 
-  const handleSaveEntry = () => {
+  const handleSaveEntry = async () => {
     if (!journalEntry.trim()) {
-      toast({
-        title: "Please write something",
-        description: "Your journal entry cannot be empty.",
-        variant: "destructive",
-      });
+      toast({ title: "Please write something", description: "Your journal entry cannot be empty.", variant: "destructive" });
       return;
     }
 
-    // Here you would save to your database
-    toast({
-      title: "Journal entry saved! 📝",
-      description: "Your thoughts have been recorded and analyzed.",
-    });
+    const detectedSentiment = analyzeSentiment(journalEntry);
+    const emotions = detectEmotions(journalEntry);
+    const score = detectedSentiment === "positive" ? 0.8 : detectedSentiment === "negative" ? 0.2 : 0.5;
 
-    setJournalEntry("");
-    setSentiment(null);
-  };
-
-  const getSentimentIcon = () => {
-    switch (sentiment) {
-      case "positive": return <Smile className="h-4 w-4 text-mood-good" />;
-      case "negative": return <Frown className="h-4 w-4 text-mood-sad" />;
-      default: return <Meh className="h-4 w-4 text-mood-neutral" />;
+    try {
+      await createEntry.mutateAsync({
+        content: journalEntry,
+        sentiment: detectedSentiment,
+        sentiment_score: score,
+        emotions,
+        ai_feedback: getFeedback(detectedSentiment, emotions),
+      });
+      toast({ title: "Journal entry saved! 📝", description: "Your thoughts have been recorded." });
+      setJournalEntry("");
+      setSentiment(null);
+    } catch {
+      toast({ title: "Failed to save", description: "Please try again.", variant: "destructive" });
     }
   };
 
-  const getSentimentColor = () => {
-    switch (sentiment) {
-      case "positive": return "bg-mood-good/20 text-mood-good border-mood-good/30";
-      case "negative": return "bg-mood-sad/20 text-mood-sad border-mood-sad/30";
-      default: return "bg-mood-neutral/20 text-mood-neutral border-mood-neutral/30";
+  const getFeedback = (sent: string, emotions: string[]): string => {
+    if (sent === "positive") return "Your writing reflects positive emotions! Keep nurturing these feelings.";
+    if (sent === "negative") {
+      if (emotions.includes("stress")) return "It sounds like you're dealing with stress. Consider a short break or breathing exercise.";
+      if (emotions.includes("anxiety")) return "Anxiety can be tough. Try grounding techniques like the 5-4-3-2-1 method.";
+      return "It sounds like you're going through a tough time. Consider talking to someone you trust.";
     }
+    return "Your writing shows balanced emotions. Reflection like this is valuable for self-awareness.";
   };
 
-  const getSentimentFeedback = () => {
-    switch (sentiment) {
-      case "positive": 
-        return "Your writing reflects positive emotions! Keep nurturing these feelings.";
-      case "negative": 
-        return "It sounds like you're going through a tough time. Consider talking to someone you trust.";
-      default: 
-        return "Your writing shows balanced emotions. This kind of reflection is valuable.";
-    }
+  const getSentimentBadge = (s: string | null) => {
+    if (!s) return null;
+    const config = {
+      positive: { icon: Smile, color: "bg-mood-good/20 text-mood-good border-mood-good/30" },
+      negative: { icon: Frown, color: "bg-mood-sad/20 text-mood-sad border-mood-sad/30" },
+      neutral: { icon: Meh, color: "bg-mood-neutral/20 text-mood-neutral border-mood-neutral/30" },
+    }[s] || { icon: Meh, color: "" };
+    const Icon = config.icon;
+    return (
+      <Badge variant="outline" className={config.color}>
+        <Icon className="h-3 w-3 mr-1" />
+        <span className="capitalize">{s}</span>
+      </Badge>
+    );
   };
-
-  const recentEntries = [
-    {
-      date: "Today, 2:30 PM",
-      preview: "Had a great study session today. Feeling productive and motivated...",
-      sentiment: "positive"
-    },
-    {
-      date: "Yesterday, 8:15 PM", 
-      preview: "Exam stress is getting to me, but I'm trying to stay positive...",
-      sentiment: "neutral"
-    },
-    {
-      date: "2 days ago, 10:45 AM",
-      preview: "Really enjoyed spending time with friends. We laughed so much...",
-      sentiment: "positive"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background p-4 space-y-6 pb-24">
-      {/* Header */}
       <div className="text-center py-6">
-        <h1 className="text-2xl font-bold flex items-center justify-center gap-2 mb-2">
+        <h1 className="text-2xl font-display font-bold flex items-center justify-center gap-2 mb-2">
           <BookOpen className="h-6 w-6 text-primary" />
           Journal
         </h1>
@@ -119,30 +119,20 @@ const Journal = () => {
               <Calendar className="h-5 w-5 text-primary" />
               New Entry
             </span>
-            {sentiment && (
-              <Badge variant="outline" className={getSentimentColor()}>
-                {getSentimentIcon()}
-                <span className="ml-1 capitalize">{sentiment}</span>
-              </Badge>
-            )}
+            {getSentimentBadge(sentiment)}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+            {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="How was your day? What's on your mind? Share your thoughts and feelings..."
+            placeholder="How was your day? What's on your mind?..."
             value={journalEntry}
             onChange={(e) => handleTextChange(e.target.value)}
             className="min-h-32 border-input focus:border-primary transition-colors resize-none"
           />
-          
+
           {sentiment && (
             <div className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
               <div className="flex items-center gap-2 mb-2">
@@ -150,58 +140,21 @@ const Journal = () => {
                 <span className="text-sm font-medium text-foreground">Sentiment Analysis</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {getSentimentFeedback()}
+                {getFeedback(sentiment, detectEmotions(journalEntry))}
               </p>
             </div>
           )}
 
           <div className="flex justify-between items-center pt-2">
-            <p className="text-xs text-muted-foreground">
-              {journalEntry.length} characters • Your entries are private and secure
-            </p>
-            <Button 
+            <p className="text-xs text-muted-foreground">{journalEntry.length} characters</p>
+            <Button
               onClick={handleSaveEntry}
-              disabled={!journalEntry.trim()}
-              className="bg-primary hover:bg-primary-dark disabled:opacity-50"
+              disabled={!journalEntry.trim() || createEntry.isPending}
+              className="bg-primary hover:bg-primary/90 disabled:opacity-50"
             >
-              <Save className="h-4 w-4 mr-2" />
+              {createEntry.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Save Entry
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* AI Insights */}
-      <Card className="border-0 bg-gradient-to-br from-accent/5 to-primary/5 shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Sparkles className="h-5 w-5 text-accent" />
-            AI Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
-            <div className="w-2 h-2 bg-accent rounded-full mt-2" />
-            <div>
-              <p className="text-sm font-medium text-foreground">Pattern Recognition</p>
-              <p className="text-xs text-muted-foreground">Your mood tends to improve when you write about accomplishments</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
-            <div className="w-2 h-2 bg-primary rounded-full mt-2" />
-            <div>
-              <p className="text-sm font-medium text-foreground">Emotional Growth</p>
-              <p className="text-xs text-muted-foreground">You're becoming better at expressing complex emotions in writing</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
-            <div className="w-2 h-2 bg-secondary rounded-full mt-2" />
-            <div>
-              <p className="text-sm font-medium text-foreground">Reflection Habit</p>
-              <p className="text-xs text-muted-foreground">You've been consistently journaling for 12 days - great habit!</p>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -209,60 +162,50 @@ const Journal = () => {
       {/* Recent Entries */}
       <Card className="border-0 bg-card shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Recent Entries</CardTitle>
+          <CardTitle className="text-lg font-display">Recent Entries</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recentEntries.map((entry, index) => (
-            <div 
-              key={index}
-              className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{entry.date}</span>
-                <Badge 
-                  variant="outline" 
-                  className={
-                    entry.sentiment === "positive" 
-                      ? "bg-mood-good/20 text-mood-good border-mood-good/30"
-                      : entry.sentiment === "negative"
-                      ? "bg-mood-sad/20 text-mood-sad border-mood-sad/30"
-                      : "bg-mood-neutral/20 text-mood-neutral border-mood-neutral/30"
-                  }
-                >
-                  {entry.sentiment === "positive" ? (
-                    <Smile className="h-3 w-3 mr-1" />
-                  ) : entry.sentiment === "negative" ? (
-                    <Frown className="h-3 w-3 mr-1" />
-                  ) : (
-                    <Meh className="h-3 w-3 mr-1" />
-                  )}
-                  {entry.sentiment}
-                </Badge>
+          {isLoading ? (
+            [1,2,3].map(i => <Skeleton key={i} className="h-24 rounded-lg" />)
+          ) : entries && entries.length > 0 ? (
+            entries.map((entry) => (
+              <div key={entry.id} className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(entry.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                  </span>
+                  {getSentimentBadge(entry.sentiment)}
+                </div>
+                <p className="text-sm text-foreground line-clamp-2">{entry.content}</p>
+                {entry.emotions && entry.emotions.length > 0 && (
+                  <div className="flex gap-1 mt-2">
+                    {entry.emotions.map((e) => (
+                      <Badge key={e} variant="outline" className="text-xs">{e}</Badge>
+                    ))}
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-foreground line-clamp-2">{entry.preview}</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No journal entries yet. Start writing to track your emotional patterns!
+            </p>
+          )}
         </CardContent>
       </Card>
 
       {/* Writing Prompts */}
       <Card className="border-0 bg-card shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Writing Prompts</CardTitle>
-          <p className="text-sm text-muted-foreground">Need inspiration? Try one of these prompts</p>
+          <CardTitle className="text-lg font-display">Writing Prompts</CardTitle>
+          <p className="text-sm text-muted-foreground">Need inspiration? Try one of these</p>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[
-            "What am I most grateful for today?",
-            "What challenge did I overcome recently?",
-            "How do I want to feel tomorrow?",
-            "What made me smile this week?",
-            "What would I tell my younger self?"
-          ].map((prompt, index) => (
+          {["What am I most grateful for today?", "What challenge did I overcome recently?", "How do I want to feel tomorrow?", "What made me smile this week?", "What would I tell my younger self?"].map((prompt, i) => (
             <Button
-              key={index}
+              key={i}
               variant="outline"
-              className="w-full text-left justify-start hover:bg-primary-light/10 hover:border-primary transition-all"
+              className="w-full text-left justify-start hover:bg-primary/5 hover:border-primary transition-all"
               onClick={() => setJournalEntry(prompt + " ")}
             >
               <span className="text-sm">{prompt}</span>

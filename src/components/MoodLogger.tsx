@@ -4,88 +4,90 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Heart, Calendar, Clock, Save } from "lucide-react";
+import { Calendar, Save, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateMoodLog, useMoodLogs } from "@/hooks/useMoodLogs";
+
+const moodOptions = [
+  { emoji: "😄", label: "Excited", color: "mood-happy" },
+  { emoji: "😊", label: "Happy", color: "mood-happy" },
+  { emoji: "😌", label: "Content", color: "mood-good" },
+  { emoji: "😐", label: "Neutral", color: "mood-neutral" },
+  { emoji: "😟", label: "Worried", color: "mood-anxious" },
+  { emoji: "😔", label: "Sad", color: "mood-sad" },
+  { emoji: "😰", label: "Anxious", color: "mood-anxious" },
+  { emoji: "😤", label: "Frustrated", color: "mood-anxious" },
+  { emoji: "😴", label: "Tired", color: "mood-neutral" },
+];
+
+const moodTags = [
+  "School", "Friends", "Family", "Health", "Sleep", "Exercise",
+  "Work", "Stress", "Relaxed", "Motivated", "Overwhelmed", "Grateful"
+];
 
 const MoodLogger = () => {
   const { toast } = useToast();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [selectedEmoji, setSelectedEmoji] = useState("");
   const [moodIntensity, setMoodIntensity] = useState([5]);
   const [moodNote, setMoodNote] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const createMood = useCreateMoodLog();
+  const { data: recentMoods } = useMoodLogs(7);
 
-  const moodOptions = [
-    { emoji: "😄", label: "Excited", color: "mood-happy" },
-    { emoji: "😊", label: "Happy", color: "mood-happy" },
-    { emoji: "😌", label: "Content", color: "mood-good" },
-    { emoji: "😐", label: "Neutral", color: "mood-neutral" },
-    { emoji: "😟", label: "Worried", color: "mood-anxious" },
-    { emoji: "😔", label: "Sad", color: "mood-sad" },
-    { emoji: "😰", label: "Anxious", color: "mood-anxious" },
-    { emoji: "😤", label: "Frustrated", color: "mood-anxious" },
-    { emoji: "😴", label: "Tired", color: "mood-neutral" },
-  ];
-
-  const moodTags = [
-    "School", "Friends", "Family", "Health", "Sleep", "Exercise", 
-    "Work", "Stress", "Relaxed", "Motivated", "Overwhelmed", "Grateful"
-  ];
-
-  const currentTime = new Date().toLocaleString();
-
-  const handleMoodSelect = (mood: string) => {
+  const handleMoodSelect = (mood: string, emoji: string) => {
     setSelectedMood(mood);
+    setSelectedEmoji(emoji);
   };
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
-  const handleSaveMood = () => {
+  const handleSaveMood = async () => {
     if (!selectedMood) {
-      toast({
-        title: "Please select a mood",
-        description: "Choose how you're feeling before saving.",
-        variant: "destructive",
-      });
+      toast({ title: "Please select a mood", description: "Choose how you're feeling before saving.", variant: "destructive" });
       return;
     }
 
-    // Here you would save to your database
-    toast({
-      title: "Mood logged successfully! 🎉",
-      description: "Your mood has been recorded and will help track your wellness journey.",
-    });
-
-    // Reset form
-    setSelectedMood(null);
-    setMoodIntensity([5]);
-    setMoodNote("");
-    setSelectedTags([]);
+    try {
+      await createMood.mutateAsync({
+        mood: selectedMood,
+        emoji: selectedEmoji,
+        intensity: moodIntensity[0],
+        tags: selectedTags,
+        note: moodNote || null,
+      });
+      toast({ title: "Mood logged! ✨", description: "Your mood has been recorded." });
+      setSelectedMood(null);
+      setSelectedEmoji("");
+      setMoodIntensity([5]);
+      setMoodNote("");
+      setSelectedTags([]);
+    } catch {
+      toast({ title: "Failed to save", description: "Please try again.", variant: "destructive" });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 space-y-6">
-      {/* Header */}
+    <div className="min-h-screen bg-background p-4 space-y-6 pb-24">
       <div className="text-center py-6">
-        <h1 className="text-3xl font-display font-bold flex items-center justify-center gap-2 mb-2 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-bounce-in">
-          💫 mood diary ✨
+        <h1 className="text-2xl font-display font-bold flex items-center justify-center gap-2 mb-2 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+          💫 Mood Check-in
         </h1>
-        <p className="text-muted-foreground font-medium">spill the tea - how u feelin rn?</p>
+        <p className="text-muted-foreground">How are you feeling right now?</p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
-          <span>{currentTime}</span>
+          <span>{new Date().toLocaleString()}</span>
         </div>
       </div>
 
       {/* Mood Selection */}
       <Card className="border-0 bg-gradient-to-br from-card via-card to-primary/5 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-display">pick ur vibe ✨</CardTitle>
+          <CardTitle className="text-lg font-display">Pick your vibe ✨</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
@@ -94,13 +96,13 @@ const MoodLogger = () => {
                 key={index}
                 variant={selectedMood === mood.label ? "default" : "outline"}
                 className={`h-20 flex-col space-y-2 transition-all duration-300 font-display ${
-                  selectedMood === mood.label 
-                    ? "bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow scale-110 animate-glow-pulse" 
-                    : "hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 hover:border-primary hover:scale-105 hover:shadow-wellness"
+                  selectedMood === mood.label
+                    ? "bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-glow scale-110"
+                    : "hover:bg-gradient-to-br hover:from-primary/10 hover:to-accent/10 hover:border-primary hover:scale-105"
                 }`}
-                onClick={() => handleMoodSelect(mood.label)}
+                onClick={() => handleMoodSelect(mood.label, mood.emoji)}
               >
-                <span className="text-3xl animate-bounce-in">{mood.emoji}</span>
+                <span className="text-3xl">{mood.emoji}</span>
                 <span className="text-xs font-medium">{mood.label}</span>
               </Button>
             ))}
@@ -108,46 +110,30 @@ const MoodLogger = () => {
         </CardContent>
       </Card>
 
-      {/* Mood Intensity */}
+      {/* Intensity */}
       {selectedMood && (
         <Card className="border-0 bg-gradient-to-br from-accent/5 via-card to-secondary/5 shadow-wellness animate-slide-up backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-display">intensity check 🌡️</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              how hard is this mood hitting? no cap 💯
-            </p>
+            <CardTitle className="text-lg font-display">Intensity 🌡️</CardTitle>
+            <p className="text-sm text-muted-foreground">How strong is this feeling?</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Mild</span>
-                <span>Intense</span>
-              </div>
-              <Slider
-                value={moodIntensity}
-                onValueChange={setMoodIntensity}
-                max={10}
-                min={1}
-                step={1}
-                className="w-full"
-              />
-              <div className="text-center">
-                <Badge variant="outline" className="bg-primary-light/20 text-primary-dark border-primary-light">
-                  {moodIntensity[0]}/10
-                </Badge>
-              </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Mild</span><span>Intense</span>
+            </div>
+            <Slider value={moodIntensity} onValueChange={setMoodIntensity} max={10} min={1} step={1} />
+            <div className="text-center">
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">{moodIntensity[0]}/10</Badge>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Mood Tags */}
+      {/* Tags */}
       <Card className="border-0 bg-gradient-to-br from-secondary/5 via-card to-primary/5 shadow-wellness backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-display">what's the sitch? 🤔</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            tag what's influencing ur energy rn (optional but helpful! 💫)
-          </p>
+          <CardTitle className="text-lg font-display">What's influencing you? 🤔</CardTitle>
+          <p className="text-sm text-muted-foreground">Tag what's affecting your energy (optional)</p>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
@@ -156,9 +142,7 @@ const MoodLogger = () => {
                 key={tag}
                 variant={selectedTags.includes(tag) ? "default" : "outline"}
                 className={`cursor-pointer transition-all duration-200 ${
-                  selectedTags.includes(tag)
-                    ? "bg-secondary text-secondary-foreground"
-                    : "hover:bg-secondary-light/20 hover:border-secondary"
+                  selectedTags.includes(tag) ? "bg-secondary text-secondary-foreground" : "hover:bg-secondary/10 hover:border-secondary"
                 }`}
                 onClick={() => handleTagToggle(tag)}
               >
@@ -169,36 +153,52 @@ const MoodLogger = () => {
         </CardContent>
       </Card>
 
-      {/* Mood Notes */}
+      {/* Notes */}
       <Card className="border-0 bg-card shadow-card">
         <CardHeader>
-          <CardTitle className="text-lg">Additional Notes</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Want to share more about your feelings? (Optional)
-          </p>
+          <CardTitle className="text-lg font-display">Additional Notes</CardTitle>
+          <p className="text-sm text-muted-foreground">Want to share more? (Optional)</p>
         </CardHeader>
         <CardContent>
           <Textarea
-            placeholder="Describe your mood in more detail..."
+            placeholder="Describe what's on your mind..."
             value={moodNote}
             onChange={(e) => setMoodNote(e.target.value)}
             className="min-h-24 border-input focus:border-primary transition-colors"
           />
-          <p className="text-xs text-muted-foreground mt-2">
-            This will be analyzed for sentiment to provide you with better insights.
-          </p>
         </CardContent>
       </Card>
 
-      {/* Save Button */}
+      {/* Recent Moods */}
+      {recentMoods && recentMoods.length > 0 && (
+        <Card className="border-0 bg-card shadow-card">
+          <CardHeader>
+            <CardTitle className="text-lg font-display">Recent Moods</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {recentMoods.slice(0, 7).map((log) => (
+                <div key={log.id} className="flex-shrink-0 text-center p-3 bg-muted rounded-lg min-w-[70px]">
+                  <span className="text-2xl">{log.emoji}</span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {new Date(log.logged_at).toLocaleDateString("en-US", { weekday: "short" })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Save */}
       <div className="pb-6">
-        <Button 
+        <Button
           onClick={handleSaveMood}
-          disabled={!selectedMood}
-          className="w-full h-14 text-lg font-display font-semibold bg-gradient-to-r from-primary via-accent to-secondary hover:from-primary-dark hover:via-accent/80 hover:to-secondary/80 disabled:opacity-50 disabled:hover:from-primary disabled:hover:via-accent disabled:hover:to-secondary transition-all duration-300 hover:scale-105 hover:shadow-glow animate-glow-pulse"
+          disabled={!selectedMood || createMood.isPending}
+          className="w-full h-14 text-lg font-display font-semibold bg-gradient-to-r from-primary via-accent to-secondary hover:opacity-90 disabled:opacity-50 transition-all duration-300"
         >
-          <Save className="h-5 w-5 mr-2" />
-          save this vibe ✨
+          {createMood.isPending ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Save className="h-5 w-5 mr-2" />}
+          Save Mood ✨
         </Button>
       </div>
     </div>
